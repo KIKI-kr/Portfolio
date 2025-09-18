@@ -6,4 +6,5 @@
 - AI, ML, DL
 
 ##Live Demo
-- Porfolio Site : xxxx
+- Porfolio Site : https://kiki-kr.github.io/Portfolio/
+- QR code Generator : https://kiki-kr.github.io/Portfolio/QRcode.html
