@@ -8,3 +8,4 @@
 ##Live Demo
 - Porfolio Site : https://kiki-kr.github.io/Portfolio/
 - QR code Generator : https://kiki-kr.github.io/Portfolio/QRcode.html
+- Girlgroup Idol WorldCup : https://kiki-kr.github.io/Portfolio/gidolwc.html
