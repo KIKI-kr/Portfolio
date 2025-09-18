@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K-POP 걸그룹 이상형 월드컵</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #0f172a; /* bg-slate-900 */
+        }
+        .choice-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #334155; /* border-slate-700 */
+        }
+        .choice-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            border-color: #64748b; /* border-slate-500 */
+        }
+        .fade-in {
+            animation: fadeInAnimation 0.5s ease-in forwards;
+        }
+        @keyframes fadeInAnimation {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="text-slate-200 flex items-center justify-center min-h-screen p-4">
+
+    <div id="container" class="w-full max-w-7xl mx-auto">
+        <!-- 시작 화면 -->
+        <div id="start-screen" class="text-center">
+            <h1 class="text-4xl md:text-6xl font-black mb-4 text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-indigo-500">
+                3-5세대 걸그룹 노래<br>이상형 월드컵 (64강)
+            </h1>
+            <p class="text-slate-400 mb-8 text-lg">당신의 최애곡을 찾아보세요!</p>
+            <button id="start-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-10 rounded-full text-xl transition-transform transform hover:scale-105">
+                시작하기 <i class="fas fa-play ml-2"></i>
+            </button>
+        </div>
+
+        <!-- 게임 화면 -->
+        <div id="game-screen" class="hidden">
+            <h2 id="round-title" class="text-3xl md:text-4xl font-bold text-center mb-8"></h2>
+            <div id="matchup-container" class="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8">
+                <!-- 선택지 A -->
+                <div id="choice-a" class="choice-card w-full md:w-1/2 max-w-lg cursor-pointer bg-slate-800 rounded-2xl p-4">
+                    <div class="aspect-video mb-4">
+                        <iframe id="video-a" class="w-full h-full rounded-lg" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <p id="info-a" class="text-center text-lg font-semibold"></p>
+                </div>
+                
+                <span class="text-4xl font-black text-sky-400 my-4 md:my-0">VS</span>
+                
+                <!-- 선택지 B -->
+                <div id="choice-b" class="choice-card w-full md:w-1/2 max-w-lg cursor-pointer bg-slate-800 rounded-2xl p-4">
+                     <div class="aspect-video mb-4">
+                        <iframe id="video-b" class="w-full h-full rounded-lg" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <p id="info-b" class="text-center text-lg font-semibold"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 우승자 화면 -->
+        <div id="winner-screen" class="hidden text-center">
+            <h1 class="text-4xl md:text-5xl font-black mb-6 text-yellow-400">최종 우승!</h1>
+            <div id="final-winner-card" class="max-w-xl mx-auto bg-slate-800 rounded-2xl p-4 border border-slate-700">
+                 <div class="aspect-video mb-4">
+                    <iframe id="video-winner" class="w-full h-full rounded-lg" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+                <p id="info-winner" class="text-center text-2xl font-bold"></p>
+            </div>
+            <button id="restart-btn" class="mt-8 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full text-lg transition-transform transform hover:scale-105">
+                <i class="fas fa-redo-alt mr-2"></i> 다시하기
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const songData = [
+            // 3rd Gen
+            { artist: "TWICE", title: "CHEER UP", youtubeId: "c7rCyll5AeY" },
+            { artist: "BLACKPINK", title: "DDU-DU DDU-DU", youtubeId: "IHNzOHi8sJs" },
+            { artist: "Red Velvet", title: "Psycho", youtubeId: "uR8Mrt1IpXg" },
+            { artist: "GFRIEND", title: "Rough", youtubeId: "r_Ga2_1pYI4" },
+            { artist: "MAMAMOO", title: "HIP", youtubeId: "KhTeiaCezwM" },
+            { artist: "TWICE", title: "TT", youtubeId: "ePpPVE-GGJw" },
+            { artist: "BLACKPINK", title: "How You Like That", youtubeId: "ioNng23DkIM" },
+            { artist: "Red Velvet", title: "Red Flavor", youtubeId: "WyiIGEHQP8o" },
+            { artist: "GFRIEND", title: "Me Gustas Tu", youtubeId: "m-qQPNuGqOk" },
+            { artist: "MAMAMOO", title: "Starry Night", youtubeId: "0FB2_P8CN_g" },
+            { artist: "Oh My Girl", title: "Dolphin", youtubeId: "oaRTMUT82eI" },
+            { artist: "TWICE", title: "FANCY", youtubeId: "kOHB85vDuow" },
+            { artist: "BLACKPINK", title: "Kill This Love", youtubeId: "2S24-y0Ij3Y" },
+            { artist: "Red Velvet", title: "Bad Boy", youtubeId: "J_CFBjAyPWE" },
+            { artist: "GFRIEND", title: "NAVILLERA", youtubeId: "SeOhp3_34a8" },
+            { artist: "MAMAMOO", title: "gogobebe", youtubeId: "y2ofh_NSPG4" },
+            { artist: "Oh My Girl", title: "Nonstop", youtubeId: "iDjQSdN_ig8" },
+            { artist: "WJSN", title: "As You Wish", youtubeId: "1J7iPS_p3gM" },
+            { artist: "Dreamcatcher", title: "BOCA", youtubeId: "L5s1f_2BwB8" },
+            { artist: "LOONA", title: "Butterfly", youtubeId: "XEOCbFJj0sI" },
+            { artist: "IZ*ONE", title: "FIESTA", youtubeId: "eDEFolvLn0A" },
+
+            // 4th Gen
+            { artist: "(G)I-DLE", title: "TOMBOY", youtubeId: "Jh4QFaPmdss" },
+            { artist: "IVE", title: "LOVE DIVE", youtubeId: "Y8JFxS1HlDo" },
+            { artist: "LE SSERAFIM", title: "ANTIFRAGILE", youtubeId: "pyf8cbqyfPs" },
+            { artist: "NewJeans", title: "Hype Boy", youtubeId: "11cta61wi0g" },
+            { artist: "aespa", title: "Next Level", youtubeId: "4TWR90KJl60" },
+            { artist: "STAYC", title: "ASAP", youtubeId: "NsY-9MCOIAQ" },
+            { artist: "ITZY", title: "WANNABE", youtubeId: "fE2h3lGlOsk" },
+            { artist: "(G)I-DLE", title: "Queencard", youtubeId: "7HDeem-P0O0" },
+            { artist: "IVE", title: "After LIKE", youtubeId: "F0B7HdiY-10" },
+            { artist: "LE SSERAFIM", title: "Perfect Night", youtubeId: "hLvW6pZkKGE" },
+            { artist: "NewJeans", title: "Ditto", youtubeId: "pSUydWEqKwE" },
+            { artist: "aespa", title: "Drama", youtubeId: "D8VEhcpeS9s" },
+            { artist: "STAYC", title: "Teddy Bear", youtubeId: "x4K15h_8O7U" },
+            { artist: "ITZY", title: "DALLA DALLA", youtubeId: "pNfTK39k55U" },
+            { artist: "fromis_9", title: "DM", youtubeId: "x_V-i4a_T_8" },
+            { artist: "NMIXX", title: "DASH", youtubeId: "fB_Q7k5b2AM" },
+            { artist: "VIVIZ", title: "BOP BOP!", youtubeId: "cM9BdomaN4I" },
+            { artist: "(G)I-DLE", title: "Nxde", youtubeId: "fCO7f0SmrDc" },
+            { artist: "IVE", title: "I AM", youtubeId: "6ZUIAxif8MQ" },
+            { artist: "LE SSERAFIM", title: "FEARLESS", youtubeId: "4hPiI_u5_sA" },
+            { artist: "NewJeans", title: "Attention", youtubeId: "js1CtxSY38I" },
+            { artist: "aespa", title: "Savage", youtubeId: "WPdWvnAAurg" },
+            { artist: "STAYC", title: "RUN2U", youtubeId: "grG41kS4MUA" },
+            { artist: "ITZY", title: "Not Shy", youtubeId: "wTowEKj244o" },
+            { artist: "Billlie", title: "GingaMingaYo", youtubeId: "tVzod2dr_vA" },
+            { artist: "NMIXX", title: "O.O", youtubeId: "3GWscde8rM8" },
+            { artist: "H1-KEY", title: "Rose Blossom", youtubeId: "_GgS-tYFxAo" },
+            { artist: "Kep1er", title: "WA DA DA", youtubeId: "n0j5NPptyM0" },
+            { artist: "XG", title: "LEFT RIGHT", youtubeId: "d5x_i0aFS3c" },
+            { artist: "Weeekly", title: "After School", youtubeId: "qfVuRQX0ydQ" },
+            { artist: "PURPLE KISS", title: "Zombie", youtubeId: "R_h_Adb3I2E" },
+            { artist: "LIGHTSUM", title: "ALIVE", youtubeId: "sLpDb9t142I" },
+            { artist: "CLASS:y", title: "SHUT DOWN", youtubeId: "LKaJ4eDEw2A" },
+            { artist: "woo!ah!", title: "Rollercoaster", youtubeId: "zLzD2iPN-sU" },
+
+            // 5th Gen
+            { artist: "FIFTY FIFTY", title: "Cupid", youtubeId: "Qc7_zRjH808" },
+            { artist: "KISS OF LIFE", title: "Midas Touch", youtubeId: "EwLg3Bl_A5E" },
+            { artist: "ILLIT", title: "Magnetic", youtubeId: "Vk5-c_v4gMU" },
+            { artist: "BABYMONSTER", title: "SHEESH", youtubeId: "m--h_m25GzQ" },
+            { artist: "tripleS", title: "Rising", youtubeId: "rX6a_SRA-M4" },
+            { artist: "CSR", title: "Pop? Pop!", youtubeId: "GAAMVzJ0tX8" },
+            { artist: "QWER", title: "T.B.H", youtubeId: "HIc5nRhgGv8" },
+            { artist: "UNIS", title: "SUPERWOMAN", youtubeId: "sS0WHyvQPYw" },
+            { artist: "YOUNG POSSE", title: "MACARONI CHEESE", youtubeId: "VAkTqgGj-5I" }
+        ];
+
+        let currentRoundSongs = [];
+        let nextRoundSongs = [];
+        let matchIndex = 0;
+        
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const winnerScreen = document.getElementById('winner-screen');
+        
+        const startBtn = document.getElementById('start-btn');
+        const restartBtn = document.getElementById('restart-btn');
+
+        const roundTitle = document.getElementById('round-title');
+        const matchupContainer = document.getElementById('matchup-container');
+        
+        const choiceA = document.getElementById('choice-a');
+        const videoA = document.getElementById('video-a');
+        const infoA = document.getElementById('info-a');
+        
+        const choiceB = document.getElementById('choice-b');
+        const videoB = document.getElementById('video-b');
+        const infoB = document.getElementById('info-b');
+        
+        const videoWinner = document.getElementById('video-winner');
+        const infoWinner = document.getElementById('info-winner');
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function startGame() {
+            startScreen.classList.add('hidden');
+            winnerScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+            
+            shuffle(songData);
+            // Ensure we have an even number for the tournament, divisible by 2. 64 is perfect.
+            const gameSize = 64; 
+            currentRoundSongs = songData.slice(0, gameSize);
+            nextRoundSongs = [];
+            matchIndex = 0;
+            
+            displayMatchup();
+        }
+
+        function displayMatchup() {
+            if (matchIndex >= currentRoundSongs.length) return;
+
+            matchupContainer.classList.remove('fade-in');
+            void matchupContainer.offsetWidth; // Trigger reflow
+            matchupContainer.classList.add('fade-in');
+
+            const round = currentRoundSongs.length;
+            let roundText;
+            switch(round) {
+                case 2: roundText = '대망의 결승'; break;
+                case 4: roundText = '준결승 (4강)'; break;
+                case 8: roundText = '8강'; break;
+                default: roundText = `${round}강`;
+            }
+            roundTitle.textContent = roundText;
+            
+            const songA = currentRoundSongs[matchIndex];
+            const songB = currentRoundSongs[matchIndex + 1];
+
+            videoA.src = `https://www.youtube.com/embed/${songA.youtubeId}`;
+            infoA.textContent = `${songA.artist} - ${songA.title}`;
+            choiceA.onclick = () => selectWinner(songA);
+
+            videoB.src = `https://www.youtube.com/embed/${songB.youtubeId}`;
+            infoB.textContent = `${songB.artist} - ${songB.title}`;
+            choiceB.onclick = () => selectWinner(songB);
+        }
+
+        function selectWinner(winnerSong) {
+            videoA.src = '';
+            videoB.src = '';
+        
+            nextRoundSongs.push(winnerSong);
+            matchIndex += 2;
+
+            if (matchIndex >= currentRoundSongs.length) {
+                if (nextRoundSongs.length === 1) {
+                    displayFinalWinner(nextRoundSongs[0]);
+                } else {
+                    currentRoundSongs = [...nextRoundSongs];
+                    shuffle(currentRoundSongs); // Shuffle winners for the next round
+                    nextRoundSongs = [];
+                    matchIndex = 0;
+                    displayMatchup();
+                }
+            } else {
+                displayMatchup();
+            }
+        }
+        
+        function displayFinalWinner(winner) {
+            gameScreen.classList.add('hidden');
+            winnerScreen.classList.remove('hidden');
+            
+            videoWinner.src = `https://www.youtube.com/embed/${winner.youtubeId}`;
+            infoWinner.textContent = `${winner.artist} - ${winner.title}`;
+        }
+
+        startBtn.addEventListener('click', startGame);
+        restartBtn.addEventListener('click', startGame);
+
+    </script>
+</body>
+</html>
+
